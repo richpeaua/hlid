@@ -1,0 +1,7 @@
+.agents/handoff/**/*.events.jsonl
+
+# Go
+/bin/
+*.test
+*.out
+hlid

@@ -1,0 +1,21 @@
+# golangci-lint config for Hlid. Install: brew install golangci-lint. The gate skips it when
+# absent, but CI should install it so the boundary/quality linters run.
+run:
+  timeout: 3m
+
+linters:
+  enable:
+    - errcheck      # unchecked errors
+    - govet
+    - staticcheck   # bugs + simplifications
+    - ineffassign
+    - unused
+    - gofmt
+    - misspell
+    - revive        # style (exported doc comments, naming)
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck

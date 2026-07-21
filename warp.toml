@@ -1,0 +1,85 @@
+# warp.toml — Hlid (identity-aware proxy, Go). Tuned from the warp defaults for a Go project.
+# Run `warp config` to see the fully-resolved configuration.
+
+[board]
+dir = "issues"
+index = "issues/README.md"
+pad = 3
+
+[queues.bug]
+dir = "issues/bugs"
+prefix = "BUG"
+grades = ["S1", "S2", "S3"]
+
+[queues.unplanned]
+dir = "issues/unplanned"
+prefix = "UNP"
+grades = ["slice-high", "slice-medium", "slice-low"]
+
+[scope]
+# scrape scope_files from a ticket when it has no explicit `## Scope files` section
+pattern = '(cmd|internal|pkg|test)/[A-Za-z0-9._/-]+\.go'
+warn_pattern = '[A-Za-z0-9._/-]+\.(mod|sum|ya?ml|json|toml)'
+
+[handoff]
+dir = ".agents/handoff"
+
+[branch]
+default = "main"
+slice = "slice/{n}"
+ticket = "ticket-{num}-{slug}"
+followup = "followups-{stamp}"
+
+[gate]
+command = "scripts/gate.sh"    # gofmt + go vet + golangci-lint + go build + go test
+
+[docs]
+workflow = ".agents/workflow.md"
+rubric = ".agents/review-rubric.md"
+standards = ".agents/STANDARDS.md"
+roles_dir = ".agents/roles"
+design = ["DESIGN.md"]
+
+[agent]
+runner = "claude"
+remediate_cap = 3
+
+[agent.roles.implement]
+agent = "warp-implementer"
+model = "claude-sonnet-5"
+effort = "medium"
+allowed = ["Read", "Write", "Edit", "Grep", "Glob",
+           "Bash(bash scripts/*)", "Bash(go *)", "Bash(gofmt*)", "Bash(golangci-lint*)",
+           "Bash(git diff:*)", "Bash(git status:*)"]
+
+[agent.roles.review]
+agent = "warp-step-reviewer"
+model = "claude-sonnet-5"
+effort = "high"
+allowed = ["Read", "Grep", "Glob", "Bash(bash scripts/*)", "Bash(go *)", "Bash(golangci-lint*)",
+           "Bash(git diff:*)", "Bash(git log:*)", "Bash(git status:*)",
+           "Bash(gh pr diff:*)", "Bash(gh pr view:*)"]
+
+[agent.roles.e2e-review]
+agent = "warp-e2e-reviewer"
+model = "claude-opus-4-8"
+effort = "medium"
+allowed = ["Read", "Grep", "Glob", "Bash(bash scripts/*)", "Bash(go *)", "Bash(golangci-lint*)",
+           "Bash(git diff:*)", "Bash(git log:*)", "Bash(git status:*)",
+           "Bash(gh pr diff:*)", "Bash(gh pr view:*)"]
+
+[metrics]
+db = ""
+file = ""
+port = 3000
+dir_name = ".warp"
+
+[github]
+ruleset_main = "hlid-main"
+ruleset_slice = "hlid-slice"
+required_check = "gate"
+merge_method = "MERGE"
+
+[session]
+command = "claude"
+args = []
