@@ -1,0 +1,32 @@
+# CI gate for Hlid. The job id `gate` is the required status check enforced by the branch-protection
+# rulesets (warp.toml [github].required_check = "gate", applied by `warp setup branch-protection`).
+# It runs the same scripts/gate.sh the local loop runs, so CI and the top-of-loop gate never diverge.
+name: gate
+
+on:
+  pull_request:
+  push:
+    branches: [main, "slice/**"]
+
+# One in-flight run per ref; a newer push cancels the older gate.
+concurrency:
+  group: gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      # golangci-lint is optional: scripts/gate.sh skips it when absent. Uncomment once a
+      # golangci-lint release supports the pinned Go toolchain, to enable the lint step in CI.
+      # - name: install golangci-lint
+      #   run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b "$(go env GOPATH)/bin"
+      - name: gate
+        run: |
+          export PATH="$(go env GOPATH)/bin:$PATH"
+          bash scripts/gate.sh
