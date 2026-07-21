@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Local top-of-loop gate: run scripts/gate.sh before every commit so nothing red lands.
+# Activated by `warp setup hooks` (sets core.hooksPath=.githooks). Skip once with: git commit --no-verify
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+exec bash scripts/gate.sh
