@@ -1,6 +1,6 @@
 # 002 — reverse-proxy handler
 
-Status: todo
+Status: wip
 Parent: DESIGN.md (components: proxy) | Slice 1 | Type: AFK
 
 ## What to build
