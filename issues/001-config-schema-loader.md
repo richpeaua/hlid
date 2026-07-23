@@ -1,6 +1,6 @@
 # 001 — config schema + loader
 
-Status: todo
+Status: wip
 Parent: DESIGN.md (Config schema, components) | Slice 1 | Type: AFK
 
 ## What to build
