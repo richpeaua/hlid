@@ -1,6 +1,6 @@
 # 003 — path-prefix router
 
-Status: todo
+Status: done - https://github.com/richpeaua/hlid/pull/4
 Parent: DESIGN.md (request lifecycle step 1; components: router) | Slice 1 | Type: AFK
 
 ## What to build
