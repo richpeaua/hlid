@@ -1,6 +1,6 @@
 # 003 — path-prefix router
 
-Status: todo
+Status: wip
 Parent: DESIGN.md (request lifecycle step 1; components: router) | Slice 1 | Type: AFK
 
 ## What to build
