@@ -1,6 +1,6 @@
 # 002 — reverse-proxy handler
 
-Status: wip
+Status: done - https://github.com/richpeaua/hlid/pull/1
 Parent: DESIGN.md (components: proxy) | Slice 1 | Type: AFK
 
 ## What to build
