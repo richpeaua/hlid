@@ -1,6 +1,6 @@
 # 004 — server assembly + healthz
 
-Status: wip
+Status: done - https://github.com/richpeaua/hlid/pull/6
 Parent: DESIGN.md (components: server; request lifecycle) | Slice 1 | Type: AFK
 
 ## What to build
