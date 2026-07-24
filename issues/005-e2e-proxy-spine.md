@@ -1,6 +1,6 @@
 # 005 — E2E: request routes through Hlid to a test upstream
 
-Status: wip
+Status: done - https://github.com/richpeaua/hlid/pull/8
 Parent: DESIGN.md (Slice 1 checkpoint; request lifecycle) | Slice 1 | Type: AFK (E2E checkpoint)
 
 ## What to build
