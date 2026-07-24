@@ -1,6 +1,6 @@
 # 004 — server assembly + healthz
 
-Status: todo
+Status: wip
 Parent: DESIGN.md (components: server; request lifecycle) | Slice 1 | Type: AFK
 
 ## What to build
