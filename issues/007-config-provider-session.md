@@ -29,19 +29,23 @@ Extends the existing `config` package only; no other package changes.
 Add to `Config.Validate()`. `TTL` uses yaml.v3's native `time.Duration` decoding.
 
 ## Behavior (no decisions)
-- `Validate` requires a non-nil `session` and `provider` (auth is now part of the spine).
-- Session rules: `CookieName` non-empty; `KeyFile` non-empty; `TTL > 0`.
-- Provider rules: `Issuer` a parseable absolute `https` URL; `ClientID`, `ClientSecretEnv`,
-  `RedirectURL` non-empty; `RedirectURL` a parseable absolute `http(s)` URL; `Scopes` contains
-  `"openid"` (defaulting to `[openid, email, profile]` when omitted).
+- `session` and `provider` are OPTIONAL at the config layer: a config may omit them and still
+  validate (the Slice-1 spine has no auth). They are validated only WHEN PRESENT. Auth is made
+  mandatory at server assembly, not here (ticket 009) — this keeps the schema growth non-breaking
+  for the Slice-1 server/e2e configs.
+- Session rules (when `session` present): `CookieName` non-empty; `KeyFile` non-empty; `TTL > 0`.
+- Provider rules (when `provider` present): `Issuer` a parseable absolute `https` URL; `ClientID`,
+  `ClientSecretEnv`, `RedirectURL` non-empty; `RedirectURL` a parseable absolute `http(s)` URL;
+  `Scopes` contains `"openid"` (defaulting to `[openid, email, profile]` when omitted).
 - The secret is NOT read here and never appears in config — only the env var name is stored.
-- All existing Slice-1 validation (listen, routes, upstreams) is preserved unchanged.
+- All existing Slice-1 validation (listen, routes, upstreams) is preserved unchanged; an auth-less
+  config that passed Slice-1 still passes.
 
 ## Acceptance
-- [ ] `Load` parses a full config (routes + session + provider, TTL like `8h`) into `*Config` (temp-file test)
-- [ ] `Validate` rejects: missing session, missing provider, empty cookie_name, empty key_file, non-positive ttl (one subtest each)
-- [ ] `Validate` rejects: non-https/relative issuer, empty client_id, empty client_secret_env, bad redirect_url, scopes lacking "openid" (one subtest each)
-- [ ] Omitted `scopes` defaults to `[openid, email, profile]`; a valid full config passes `Validate`
+- [ ] `Load` parses a full config (routes + session + provider, TTL like `8h`) into `*Config`, and also parses a valid auth-less config (routes only) — both pass `Validate` (temp-file subtests)
+- [ ] With `session` present, `Validate` rejects empty cookie_name, empty key_file, non-positive ttl (one subtest each); omitting `session` entirely is accepted
+- [ ] With `provider` present, `Validate` rejects non-https/relative issuer, empty client_id, empty client_secret_env, bad redirect_url, scopes lacking "openid" (one subtest each); omitting `provider` entirely is accepted
+- [ ] Omitted `scopes` (provider present) defaults to `[openid, email, profile]`
 - [ ] Existing Slice-1 route/listen validation still passes and still rejects its prior bad inputs
 
 ## Scope files

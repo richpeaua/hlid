@@ -80,6 +80,11 @@ provider:                     # single OIDC provider (v0; a list may come later)
 - **Auth middleware**: loads/verifies the session cookie; on an unauthenticated request it
   starts login (`302` for a browser navigation, else `401`) and never falls through to an
   upstream. `/healthz` and `/auth/*` are exempt.
+- **Where auth turns on (outside-in construction)**: the config layer treats `session`/`provider`
+  as optional (a Slice-1-shaped, auth-less config still validates); auth is wired at server
+  assembly and is *active when configured* (`session` AND `provider` present), so the Slice-1
+  spine keeps building green while Slice 2 lands. Production configs always carry auth; the E2E
+  checkpoint proves the enforced path. A half-set auth config (one of the two) is rejected.
 
 ## Security model
 - Fail closed: any auth/session/policy error denies (401/403); it never forwards.

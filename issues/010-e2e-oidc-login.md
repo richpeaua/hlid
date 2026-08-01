@@ -8,6 +8,12 @@ redirected to login, completes the OIDC authorization-code flow against a fake p
 now-authenticated request reaches the upstream. Plus any `cmd/hlid/main.go` wiring the flow needs
 (discovery happens at startup; surface errors via `log.Fatal`).
 
+This checkpoint flips the running config to **auth-enforced**. The Slice-1 e2e
+(`test/e2e/proxy_test.go`) builds an auth-LESS config and asserts unauthenticated requests reach
+the upstream — still valid under ticket 009's active-when-configured wiring, so leave those cases
+as the "no-auth passthrough" baseline OR fold them into the auth config by authenticating first.
+The NEW behavior (redirect-then-reach) lives in `test/e2e/auth_test.go`.
+
     // test/e2e/auth_test.go — black-box: real server.New handler + a fake OIDC provider
     //   (httptest server serving /.well-known/openid-configuration, JWKS, and the token endpoint,
     //   signing ID tokens with a test key) + a test upstream.
