@@ -9,3 +9,4 @@
 | BUG-007 | S3 | internal/config/config.go:35 Provider.RedirectURL doc says 'absolute https callback URL' but provider.validate accepts http(s) per spec; doc/code drift, fix comment (007 review-r1) |  |
 | BUG-008 | S2 | internal/auth/auth.go:194 Callback redirects to pre.Path from the pre-auth cookie without re-applying Login's same-origin guard (returnPath); asymmetric open-redirect defense, harden the read path (008 review-r1) |  |
 | BUG-009 | S3 | internal/auth/auth_test.go:199 TestNew/unreachable_discovery dials real 127.0.0.1:1 instead of a closed httptest.Server; STANDARDS says no real network in unit tests (008 review-r1) |  |
+| BUG-010 | S3 | internal/auth/middleware_test.go:95 table field wantNav is declared but never read; subtests hardcode expected status, so a future case setting wantNav would silently no-op (009 review-r1) |  |
