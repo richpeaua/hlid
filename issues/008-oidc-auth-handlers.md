@@ -1,5 +1,7 @@
 # 008 — OIDC auth handlers (login + callback)
 
+Status: done - https://github.com/richpeaua/hlid/pull/15
+
 Parent: DESIGN.md (components: auth; Auth & session decisions) | Slice 2 | Type: AFK
 
 ## What to build
