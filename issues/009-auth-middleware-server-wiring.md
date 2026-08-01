@@ -1,5 +1,7 @@
 # 009 — session middleware + server wiring
 
+Status: done - https://github.com/richpeaua/hlid/pull/17
+
 Parent: DESIGN.md (request lifecycle steps 2-3; Auth & session decisions) | Slice 2 | Type: AFK
 
 ## What to build

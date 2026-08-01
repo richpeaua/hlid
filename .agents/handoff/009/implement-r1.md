@@ -1,0 +1,1 @@
+This command needs your approval to run — please approve it so I can commit via `warp git commit 009 "Wire auth middleware and server auth config"`.

@@ -3,13 +3,16 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/richpeaua/hlid/internal/auth"
 	"github.com/richpeaua/hlid/internal/config"
 	"github.com/richpeaua/hlid/internal/router"
+	"github.com/richpeaua/hlid/internal/session"
 )
 
 const (
@@ -17,13 +20,30 @@ const (
 	idleTimeout       = 60 * time.Second
 )
 
-// New builds the top-level http.Server from cfg: a mux that serves GET /healthz -> 200 "ok"
-// and delegates everything else to a router.Router built from cfg.Routes. Applies the base
-// middleware chain (request logging placeholder + panic recovery). Sets Addr from cfg.Listen
-// and sane ReadHeaderTimeout/IdleTimeout.
+// New builds the top-level http.Server from cfg; equivalent to NewWithContext with
+// context.Background() as the discovery context (see NewWithContext).
 func New(cfg *config.Config) (*http.Server, error) {
+	return NewWithContext(context.Background(), cfg)
+}
+
+// NewWithContext builds the top-level http.Server from cfg: a mux that serves GET /healthz ->
+// 200 "ok" and delegates everything else to a router.Router built from cfg.Routes. Applies the
+// base middleware chain (request logging placeholder + panic recovery).
+//
+// When cfg carries auth (both Session and Provider set), it additionally builds the session
+// store and Authenticator (ctx bounds OIDC discovery), mounts /auth/ to the Authenticator's
+// Handler, and wraps the router with the Authenticator's Middleware so proxied routes require a
+// valid session. When neither Session nor Provider is set, the server is assembled without auth
+// (Slice-1 shape). Exactly one of Session/Provider set is an error (can't half-configure auth).
+//
+// Sets Addr from cfg.Listen and sane ReadHeaderTimeout/IdleTimeout.
+func NewWithContext(ctx context.Context, cfg *config.Config) (*http.Server, error) {
 	if err := cfg.Validate(); err != nil {
 		return nil, fmt.Errorf("server: invalid config: %w", err)
+	}
+
+	if (cfg.Session == nil) != (cfg.Provider == nil) {
+		return nil, fmt.Errorf("server: session and provider must both be set or both be unset")
 	}
 
 	rt, err := router.New(cfg.Routes)
@@ -36,7 +56,30 @@ func New(cfg *config.Config) (*http.Server, error) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("ok"))
 	})
-	mux.Handle("/", rt)
+
+	var routed http.Handler = rt
+
+	if cfg.Session != nil && cfg.Provider != nil {
+		key, err := session.LoadKey(cfg.Session.KeyFile)
+		if err != nil {
+			return nil, fmt.Errorf("server: load session key: %w", err)
+		}
+
+		store, err := session.NewStore(key)
+		if err != nil {
+			return nil, fmt.Errorf("server: build session store: %w", err)
+		}
+
+		a, err := auth.New(ctx, *cfg.Provider, *cfg.Session, store)
+		if err != nil {
+			return nil, fmt.Errorf("server: build authenticator: %w", err)
+		}
+
+		mux.Handle("/auth/", a.Handler())
+		routed = a.Middleware(rt)
+	}
+
+	mux.Handle("/", routed)
 
 	handler := chain(mux, logging, recoverPanic)
 
