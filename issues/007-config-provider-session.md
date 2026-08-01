@@ -1,5 +1,7 @@
 # 007 — config schema: OIDC provider + session
 
+Status: wip
+
 Parent: DESIGN.md (Config schema; Auth & session decisions) | Slice 2 | Type: AFK
 
 ## What to build
