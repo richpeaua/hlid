@@ -30,3 +30,8 @@ Binding rules: `.agents/STANDARDS.md`. Design authority: `DESIGN.md`.
 | 003 | path-prefix router | 1 | 001, 002 |
 | 004 | server assembly + healthz | 1 | 003 |
 | 005 | E2E: request routes through Hlid to a test upstream | 1 | 004 |
+| 006 | session cookie store (AES-256-GCM) | 2 | — |
+| 007 | config schema: OIDC provider + session | 2 | — |
+| 008 | OIDC auth handlers (login + callback) | 2 | 006, 007 |
+| 009 | session middleware + server wiring | 2 | 008 |
+| 010 | E2E: OIDC login flow through Hlid | 2 | 009 |
