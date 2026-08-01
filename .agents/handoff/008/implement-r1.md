@@ -1,0 +1,1 @@
+This command needs your approval to run — please approve it so I can commit via `warp git commit 008 "Add OIDC auth handlers (login + callback)"`.
