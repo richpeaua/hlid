@@ -10,3 +10,4 @@
 | BUG-008 | S2 | internal/auth/auth.go:194 Callback redirects to pre.Path from the pre-auth cookie without re-applying Login's same-origin guard (returnPath); asymmetric open-redirect defense, harden the read path (008 review-r1) |  |
 | BUG-009 | S3 | internal/auth/auth_test.go:199 TestNew/unreachable_discovery dials real 127.0.0.1:1 instead of a closed httptest.Server; STANDARDS says no real network in unit tests (008 review-r1) |  |
 | BUG-010 | S3 | internal/auth/middleware_test.go:95 table field wantNav is declared but never read; subtests hardcode expected status, so a future case setting wantNav would silently no-op (009 review-r1) |  |
+| BUG-011 | S2 | middleware.go:34 calls Login on the original request, but Login derives return path only from redirect_to query param (auth.go:200); middleware-initiated login has none, so post-login Callback redirects to / not the requested path. Thread original path into the flow (010 e2e-review) |  |
