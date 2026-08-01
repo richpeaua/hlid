@@ -1,5 +1,7 @@
 # 006 — session cookie store (AES-256-GCM)
 
+Status: wip
+
 Parent: DESIGN.md (components: session; Auth & session decisions) | Slice 2 | Type: AFK
 
 ## What to build
