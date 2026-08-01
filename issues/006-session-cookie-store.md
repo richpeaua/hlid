@@ -1,6 +1,6 @@
 # 006 — session cookie store (AES-256-GCM)
 
-Status: wip
+Status: done - https://github.com/richpeaua/hlid/pull/11
 
 Parent: DESIGN.md (components: session; Auth & session decisions) | Slice 2 | Type: AFK
 
