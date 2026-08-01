@@ -1,5 +1,7 @@
 # 010 — E2E: OIDC login flow through Hlid
 
+Status: wip
+
 Parent: DESIGN.md (Slice 2 checkpoint; request lifecycle) | Slice 2 | Type: AFK (E2E checkpoint)
 
 ## What to build
