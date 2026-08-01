@@ -43,7 +43,7 @@ then identity injection (5).
 - **policy** (later) - evaluate per-route allow rules against the session identity.
 - **identity** (later) - mint the signed upstream identity header / JWT.
 
-## Config schema (v0, grows per slice)
+## Config schema (grows per slice)
 ```yaml
 listen: ":8443"
 routes:
@@ -51,9 +51,35 @@ routes:
     upstream: http://127.0.0.1:9001
   - path: /
     upstream: http://127.0.0.1:9000
+
+# Slice 2 — OIDC authentication:
+session:
+  cookie_name: hlid_session   # session cookie name
+  key_file: /etc/hlid/session.key  # 32-byte AES-256 key, base64 in a file (env HLID_SESSION_KEY overrides)
+  ttl: 8h                     # session lifetime
+provider:                     # single OIDC provider (v0; a list may come later)
+  issuer: https://accounts.example.com  # OIDC discovery base (must serve /.well-known/openid-configuration)
+  client_id: hlid
+  client_secret_env: HLID_CLIENT_SECRET # env var name holding the secret; never inline
+  redirect_url: https://hlid.example.com/auth/callback
+  scopes: [openid, email, profile]
+
 # added in later slices:
-# providers: [...]   session: {...}   policy: [...]
+# policy: [...]
 ```
+
+## Auth & session decisions (Slice 2, binding)
+- **OIDC**: `github.com/coreos/go-oidc/v3` + `golang.org/x/oauth2` handle discovery, JWKS
+  rotation, and ID-token verification. We do not hand-roll JWKS/token verification.
+- **Session cookie**: hand-rolled `internal/session` using **AES-256-GCM** authenticated
+  encryption (confidentiality + integrity in one primitive) over the serialized identity. The
+  32-byte key comes from env/file (never config-in-git), fail-closed on a missing/short key.
+- **Login endpoints** live under a fixed reserved prefix `/auth/` (`/auth/login`,
+  `/auth/callback`) that the router never proxies. Auth-code flow carries `state` (CSRF) and
+  `nonce` (ID-token replay), both bound to the pre-auth cookie and verified on callback.
+- **Auth middleware**: loads/verifies the session cookie; on an unauthenticated request it
+  starts login (`302` for a browser navigation, else `401`) and never falls through to an
+  upstream. `/healthz` and `/auth/*` are exempt.
 
 ## Security model
 - Fail closed: any auth/session/policy error denies (401/403); it never forwards.
